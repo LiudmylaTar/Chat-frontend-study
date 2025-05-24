@@ -3,7 +3,7 @@ import { RiDeleteBinLine, RiEdit2Line } from "react-icons/ri";
 import css from "./ChatPreviewItem.module.css";
 
 export default function ChatPreviewItem({ chat, onDeleted, onEdit }) {
-  const { firstName, lastName, messages } = chat;
+  const { firstName, lastName, messages, id } = chat;
   const fullName = `${firstName} ${lastName}`.trim();
 
   const lastMessageObj = messages[messages.length - 1];
@@ -23,7 +23,7 @@ export default function ChatPreviewItem({ chat, onDeleted, onEdit }) {
       <FaUserCircle className={css.avatar} />
       <button
         className={`${css.button} ${css.deleteButton}`}
-        onClick={() => onDeleted(initialData.id)}
+        onClick={() => onDeleted(id)}
         type="button"
       >
         <RiDeleteBinLine size={18} />

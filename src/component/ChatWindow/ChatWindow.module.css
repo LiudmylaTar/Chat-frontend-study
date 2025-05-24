@@ -1,0 +1,25 @@
+.chatWindow {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
+}
+
+.headChat {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px;
+  border-bottom: 1px solid #ddd;
+}
+
+.name {
+  font-weight: bold;
+  font-size: 16px;
+}
+
+.chatList {
+  flex-grow: 1;
+  overflow-y: auto;
+  min-height: 0;
+}

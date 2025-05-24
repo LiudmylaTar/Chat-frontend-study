@@ -15,7 +15,7 @@ export default function ChatWindow({ chat }) {
         <p className={css.name}>{fullName}</p>
       </div>
 
-      <MessageList messages={chat.messages} />
+      <MessageList messages={chat.messages} className={css.chatList} />
       <MessageInput chatId={chat.id} />
     </div>
   );

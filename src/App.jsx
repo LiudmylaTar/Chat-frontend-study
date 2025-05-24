@@ -28,6 +28,13 @@ function App() {
         .includes(debouncedInputValue.toLowerCase())
     );
   }, [debouncedInputValue, chats]);
+
+  const deleteChat = (chatId) => {
+    setChats((prevChats) => {
+      return prevChats.filter((chat) => chat.id !== chatId);
+    });
+  };
+
   return (
     <>
       <Header />
@@ -46,6 +53,7 @@ function App() {
           <ChatPreviewList
             filterChats={searchChat}
             onAddClick={() => setIsModalOpen(true)}
+            onDelete={deleteChat}
           />
         </aside>
         <main className="chat-area">
