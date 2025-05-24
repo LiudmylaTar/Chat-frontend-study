@@ -1,0 +1,35 @@
+.modal {
+  position: relative;
+  background: rgb(234, 245, 242);
+  padding: 24px;
+  max-width: 90vw;
+  max-height: 90vh;
+  margin: auto;
+  border-radius: 8px;
+  overflow: auto;
+}
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.closeBtn {
+  position: absolute;
+  top: 0px;
+  right: -6px;
+  background: none;
+  border: none;
+  color: #141416;
+  cursor: pointer;
+}

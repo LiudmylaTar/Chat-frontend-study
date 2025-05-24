@@ -1,0 +1,59 @@
+.preview {
+  position: relative; /* додаємо */
+  display: flex;
+  align-items: center;
+  padding: 10px;
+  border-bottom: 1px solid #eee;
+}
+
+.avatar {
+  font-size: 32px;
+  margin-right: 10px;
+}
+
+.info {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.name {
+  font-weight: bold;
+  font-size: 16px;
+}
+
+.message {
+  color: #666;
+  font-size: 14px;
+}
+
+.date {
+  font-size: 12px;
+  color: #999;
+}
+
+.button {
+  position: absolute;
+  padding: 8px;
+  border: none;
+  background-color: transparent;
+  transition: transform var(--animation-cubicBezier);
+}
+
+.button:hover,
+.button:focus {
+  transform: scale(1.05);
+}
+
+.deleteButton {
+  top: 4px;
+  right: 4px;
+  color: rgb(212, 58, 58);
+}
+
+.editButton {
+  bottom: 4px;
+  right: 4px;
+  color: rgb(88, 156, 179);
+}

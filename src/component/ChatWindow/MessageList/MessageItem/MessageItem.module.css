@@ -1,0 +1,15 @@
+.userMsg {
+  align-self: flex-end;
+  background: #d0f0c0;
+  padding: 8px;
+  border-radius: 10px;
+  margin: 5px;
+}
+
+.botMsg {
+  align-self: flex-start;
+  background: #f0f0f0;
+  padding: 8px;
+  border-radius: 10px;
+  margin: 5px;
+}
