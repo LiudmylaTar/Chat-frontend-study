@@ -1,7 +1,14 @@
 import css from "./ChatPreviewList.module.css";
 import ChatPreviewItem from "../ChatPreviewItem/ChatPreviewItem";
 
-export default function ChatPreviewList({ filterChats, onAddClick, onDelete }) {
+export default function ChatPreviewList({
+  filterChats,
+  onAddClick,
+  onDelete,
+  onChatSelect,
+  selectedChatId,
+  onEdit,
+}) {
   return (
     <div>
       <h3>Chats</h3>
@@ -12,7 +19,14 @@ export default function ChatPreviewList({ filterChats, onAddClick, onDelete }) {
         </div>
       ) : (
         filterChats.map((chat) => (
-          <ChatPreviewItem key={chat.id} chat={chat} onDeleted={onDelete} />
+          <ChatPreviewItem
+            key={chat._id}
+            chat={chat}
+            onDeleted={onDelete}
+            onClick={() => onChatSelect(chat)}
+            isSelected={chat._id === selectedChatId}
+            onEdit={onEdit}
+          />
         ))
       )}
     </div>

@@ -3,7 +3,7 @@ import AvatarWithStatus from "../AvatarWithStatus/AvatarWithStatus";
 import MessageList from "./MessageList/MessageList";
 import MessageInput from "./MessageInput/MessageInput";
 
-export default function ChatWindow({ chat }) {
+export default function ChatWindow({ chat, onAddMessage }) {
   if (!chat) return <p>Select a chat to start messaging</p>;
 
   const fullName = `${chat.firstName} ${chat.lastName}`.trim();
@@ -15,8 +15,8 @@ export default function ChatWindow({ chat }) {
         <p className={css.name}>{fullName}</p>
       </div>
 
-      <MessageList messages={chat.messages} className={css.chatList} />
-      <MessageInput chatId={chat.id} />
+      <MessageList messages={chat.messages} />
+      <MessageInput chatId={chat._id} onAddMessage={onAddMessage} />
     </div>
   );
 }

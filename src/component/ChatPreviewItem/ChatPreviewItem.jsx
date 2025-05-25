@@ -2,7 +2,7 @@ import { FaUserCircle } from "react-icons/fa";
 import { RiDeleteBinLine, RiEdit2Line } from "react-icons/ri";
 import css from "./ChatPreviewItem.module.css";
 
-export default function ChatPreviewItem({ chat, onDeleted, onEdit }) {
+export default function ChatPreviewItem({ chat, onDeleted, onEdit, onClick }) {
   const { firstName, lastName, messages, id } = chat;
   const fullName = `${firstName} ${lastName}`.trim();
 
@@ -19,11 +19,14 @@ export default function ChatPreviewItem({ chat, onDeleted, onEdit }) {
     : "";
 
   return (
-    <div className={css.preview}>
+    <div className={css.preview} onClick={onClick}>
       <FaUserCircle className={css.avatar} />
       <button
         className={`${css.button} ${css.deleteButton}`}
-        onClick={() => onDeleted(id)}
+        onClick={(e) => {
+          e.stopPropagation(); // щоб не викликати onClick для preview
+          onDeleted(chat._id);
+        }}
         type="button"
       >
         <RiDeleteBinLine size={18} />
@@ -35,7 +38,10 @@ export default function ChatPreviewItem({ chat, onDeleted, onEdit }) {
       <div className={css.date}>{formattedDate}</div>
       <button
         className={`${css.button} ${css.editButton}`}
-        onClick={() => onEdit(initialData)}
+        onClick={(e) => {
+          e.stopPropagation();
+          onEdit(chat);
+        }}
         type="button"
       >
         <RiEdit2Line size={18} />

@@ -1,24 +1,48 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import ChatSearchInput from "./component/ChatSearchInput/ChatSearchInput";
 import ChatPreviewList from "./component/ChatPreviewList/ChatPreviewList";
 import "./App.css";
 import Header from "./component/Header/Header";
 import ChatWindow from "./component/ChatWindow/ChatWindow";
-import { mockChats } from "./data/mockChats";
+// import { mockChats } from "./data/mockChats";
 import NewChatModal from "./component/NewChatModal/NewChatModal";
-
+import axios from "axios";
 import { useDebounce } from "use-debounce";
 
 function App() {
-  const [selectedChat] = useState(mockChats[0]);
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [chats, setChats] = useState([...mockChats]);
-
+  const [chats, setChats] = useState([]);
+  const [selectedChat, setSelectedChat] = useState(null);
   const [search, setSearch] = useState("");
   const [debouncedInputValue] = useDebounce(search, 500);
+  const [editChat, setEditChat] = useState(null);
+  const isModalOpen = !!editChat;
 
-  const handleCreateChat = (newChat) => {
-    setChats((prev) => [...prev, newChat]);
+  useEffect(() => {
+    const fetchChats = async () => {
+      try {
+        const res = await axios.get("http://localhost:5000/api/chat");
+        setChats(res.data);
+        setSelectedChat(res.data[0] || null); // перший чат — як активний
+      } catch (err) {
+        console.error("Failed to fetch chats:", err);
+      }
+    };
+    fetchChats();
+  }, []);
+
+  const handleCreateChat = async (newChatData) => {
+    try {
+      const res = await axios.post(
+        "http://localhost:5000/api/chat",
+        newChatData
+      );
+      const createdChat = res.data;
+
+      setChats((prev) => [...prev, createdChat]);
+      setEditChat(null);
+    } catch (err) {
+      console.error("Failed to create chat:", err);
+    }
   };
 
   const searchChat = useMemo(() => {
@@ -30,9 +54,42 @@ function App() {
   }, [debouncedInputValue, chats]);
 
   const deleteChat = (chatId) => {
-    setChats((prevChats) => {
-      return prevChats.filter((chat) => chat.id !== chatId);
-    });
+    setChats((prevChats) => prevChats.filter((chat) => chat._id !== chatId));
+    if (selectedChat?._id === chatId) {
+      setSelectedChat(null); // якщо видалили активний чат
+    }
+  };
+
+  const addMessageToChat = (chatId, message) => {
+    setChats((prevChats) =>
+      prevChats.map((chat) =>
+        chat._id === chatId
+          ? { ...chat, messages: [...chat.messages, message] }
+          : chat
+      )
+    );
+    if (selectedChat?._id === chatId) {
+      setSelectedChat((prev) => ({
+        ...prev,
+        messages: [...prev.messages, message],
+      }));
+    }
+  };
+
+  const handleUpdateChat = (updatedChat) => {
+    setChats((prevChats) =>
+      prevChats.map((chat) =>
+        chat._id === updatedChat._id ? updatedChat : chat
+      )
+    );
+    if (selectedChat?._id === updatedChat._id) {
+      setSelectedChat(updatedChat);
+    }
+    setEditChat(null);
+  };
+
+  const handleOpenModal = () => {
+    setEditChat({ firstName: "", lastName: "" });
   };
 
   return (
@@ -43,21 +100,35 @@ function App() {
           <ChatSearchInput
             value={search}
             onFilter={setSearch}
-            onAddClick={() => setIsModalOpen(true)}
+            onAddClick={handleOpenModal}
           />
           <NewChatModal
             isOpen={isModalOpen}
-            onClose={() => setIsModalOpen(false)}
-            onCreate={handleCreateChat}
+            initialData={editChat}
+            onClose={() => setEditChat(null)}
+            onSave={(chat) => {
+              if (chat._id) {
+                handleUpdateChat(chat);
+              } else {
+                handleCreateChat(chat);
+              }
+            }}
           />
           <ChatPreviewList
             filterChats={searchChat}
-            onAddClick={() => setIsModalOpen(true)}
+            onChatSelect={setSelectedChat}
+            selectedChatId={selectedChat?._id}
             onDelete={deleteChat}
+            onEdit={setEditChat}
+            onAddClick={handleOpenModal}
           />
         </aside>
         <main className="chat-area">
-          <ChatWindow chat={selectedChat} />
+          {selectedChat ? (
+            <ChatWindow chat={selectedChat} onAddMessage={addMessageToChat} />
+          ) : (
+            <p style={{ padding: "1rem" }}>Select or create a chat</p>
+          )}
         </main>
       </div>
     </>
