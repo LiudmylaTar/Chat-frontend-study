@@ -8,6 +8,8 @@ export default function NewChatModal({ isOpen, onClose, onSave, initialData }) {
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
 
+  const BASE_URL = import.meta.env.VITE_API_BASE_URL;
+
   useEffect(() => {
     if (initialData) {
       setFirstName(initialData.firstName || "");
@@ -25,16 +27,13 @@ export default function NewChatModal({ isOpen, onClose, onSave, initialData }) {
 
       if (initialData?._id) {
         // edit
-        response = await axios.put(
-          `http://localhost:5000/api/chat/${initialData._id}`,
-          {
-            firstName,
-            lastName,
-          }
-        );
+        response = await axios.put(`${BASE_URL}/api/chat/${initialData._id}`, {
+          firstName,
+          lastName,
+        });
       } else {
         // created
-        response = await axios.post("http://localhost:5000/api/chat", {
+        response = await axios.post(`${BASE_URL}/api/chat`, {
           firstName,
           lastName,
         });

@@ -6,6 +6,8 @@ import { useState } from "react";
 export default function MessageInput({ chatId, onAddMessage }) {
   const [text, setText] = useState("");
 
+  const BASE_URL = import.meta.env.VITE_API_BASE_URL;
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -21,7 +23,7 @@ export default function MessageInput({ chatId, onAddMessage }) {
     setText("");
 
     try {
-      const res = await axios.post("http://localhost:5000/api/chat/message", {
+      const res = await axios.post(`${BASE_URL}/api/chat/message`, {
         chatId,
         message: text,
       });

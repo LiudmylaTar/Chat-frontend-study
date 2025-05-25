@@ -17,10 +17,12 @@ function App() {
   const [editChat, setEditChat] = useState(null);
   const isModalOpen = !!editChat;
 
+  const BASE_URL = import.meta.env.VITE_API_BASE_URL;
+
   useEffect(() => {
     const fetchChats = async () => {
       try {
-        const res = await axios.get("http://localhost:5000/api/chat");
+        const res = await axios.get(`${BASE_URL}/api/chat`);
         setChats(res.data);
         setSelectedChat(res.data[0] || null); // перший чат — як активний
       } catch (err) {
@@ -32,10 +34,7 @@ function App() {
 
   const handleCreateChat = async (newChatData) => {
     try {
-      const res = await axios.post(
-        "http://localhost:5000/api/chat",
-        newChatData
-      );
+      const res = await axios.post(`${BASE_URL}/api/chat`, newChatData);
       const createdChat = res.data;
 
       setChats((prev) => [...prev, createdChat]);
