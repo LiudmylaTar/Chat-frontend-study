@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo, useEffect, useRef } from "react";
 import ChatSearchInput from "./component/ChatSearchInput/ChatSearchInput";
 import ChatPreviewList from "./component/ChatPreviewList/ChatPreviewList";
 import "./App.css";
@@ -8,6 +8,8 @@ import ChatWindow from "./component/ChatWindow/ChatWindow";
 import NewChatModal from "./component/NewChatModal/NewChatModal";
 import axios from "axios";
 import { useDebounce } from "use-debounce";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 function App() {
   const [chats, setChats] = useState([]);
@@ -16,6 +18,7 @@ function App() {
   const [debouncedInputValue] = useDebounce(search, 500);
   const [editChat, setEditChat] = useState(null);
   const isModalOpen = !!editChat;
+  const selectedChatIdRef = useRef(selectedChat?._id);
 
   const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
@@ -31,6 +34,10 @@ function App() {
     };
     fetchChats();
   }, []);
+
+  useEffect(() => {
+    selectedChatIdRef.current = selectedChat?._id;
+  }, [selectedChat]);
 
   const handleCreateChat = async (newChatData) => {
     try {
@@ -52,14 +59,33 @@ function App() {
     );
   }, [debouncedInputValue, chats]);
 
-  const deleteChat = (chatId) => {
-    setChats((prevChats) => prevChats.filter((chat) => chat._id !== chatId));
-    if (selectedChat?._id === chatId) {
-      setSelectedChat(null); // якщо видалили активний чат
+  const handleDelete = async (chatId) => {
+    try {
+      const res = await fetch(`${BASE_URL}/api/chat/${chatId}`, {
+        method: "DELETE",
+      });
+      const data = await res.json();
+      setChats((prevChats) => prevChats.filter((chat) => chat._id !== chatId));
+
+      if (selectedChat?._id === chatId) {
+        setSelectedChat(null);
+      }
+    } catch (error) {
+      console.error("❌ Delete Error:", error);
     }
   };
 
   const addMessageToChat = (chatId, message) => {
+    console.log("DEBUG:", {
+      chatId,
+      selectedId: selectedChatIdRef.current,
+      sender: message.sender,
+    });
+
+    if (chatId !== selectedChatIdRef.current && message.sender === "bot") {
+      toast.info(`New message from "${message.text}"`);
+    }
+
     setChats((prevChats) =>
       prevChats.map((chat) =>
         chat._id === chatId
@@ -67,14 +93,7 @@ function App() {
           : chat
       )
     );
-    if (selectedChat?._id === chatId) {
-      setSelectedChat((prev) => ({
-        ...prev,
-        messages: [...prev.messages, message],
-      }));
-    }
   };
-
   const handleUpdateChat = (updatedChat) => {
     setChats((prevChats) =>
       prevChats.map((chat) =>
@@ -91,9 +110,15 @@ function App() {
     setEditChat({ firstName: "", lastName: "" });
   };
 
+  const handleChatSelect = (chat) => {
+    console.log("Selected chat changed to:", chat._id);
+    setSelectedChat(chat);
+  };
+
   return (
     <>
       <Header />
+      <ToastContainer position="top-right" autoClose={3000} />
       <div className="main-container">
         <aside className="sidebar">
           <ChatSearchInput
@@ -106,18 +131,18 @@ function App() {
             initialData={editChat}
             onClose={() => setEditChat(null)}
             onSave={(chat) => {
-              if (chat._id) {
+              if (editChat?._id) {
                 handleUpdateChat(chat);
               } else {
-                handleCreateChat(chat);
+                setChats((prev) => [...prev, chat]);
               }
             }}
           />
           <ChatPreviewList
             filterChats={searchChat}
-            onChatSelect={setSelectedChat}
+            onChatSelect={handleChatSelect}
             selectedChatId={selectedChat?._id}
-            onDelete={deleteChat}
+            onDelete={handleDelete}
             onEdit={setEditChat}
             onAddClick={handleOpenModal}
           />

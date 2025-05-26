@@ -34,7 +34,6 @@ export default function MessageInput({ chatId, onAddMessage }) {
         sender: "bot",
         createdAt: new Date().toISOString(),
       };
-
       onAddMessage(chatId, botMsg);
     } catch (error) {
       console.error("Error sending message:", error);

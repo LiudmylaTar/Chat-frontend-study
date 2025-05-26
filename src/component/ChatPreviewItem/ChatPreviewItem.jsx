@@ -3,7 +3,7 @@ import { RiDeleteBinLine, RiEdit2Line } from "react-icons/ri";
 import css from "./ChatPreviewItem.module.css";
 
 export default function ChatPreviewItem({ chat, onDeleted, onEdit, onClick }) {
-  const { firstName, lastName, messages, id } = chat;
+  const { firstName, lastName, messages } = chat;
   const fullName = `${firstName} ${lastName}`.trim();
 
   const lastMessageObj = messages[messages.length - 1];
@@ -24,12 +24,12 @@ export default function ChatPreviewItem({ chat, onDeleted, onEdit, onClick }) {
       <button
         className={`${css.button} ${css.deleteButton}`}
         onClick={(e) => {
-          e.stopPropagation(); // щоб не викликати onClick для preview
+          e.stopPropagation();
           onDeleted(chat._id);
         }}
         type="button"
       >
-        <RiDeleteBinLine size={18} />
+        <RiDeleteBinLine size={16} />
       </button>
       <div className={css.info}>
         <h4 className={css.name}>{fullName}</h4>
@@ -44,7 +44,7 @@ export default function ChatPreviewItem({ chat, onDeleted, onEdit, onClick }) {
         }}
         type="button"
       >
-        <RiEdit2Line size={18} />
+        <RiEdit2Line size={16} />
       </button>
     </div>
   );

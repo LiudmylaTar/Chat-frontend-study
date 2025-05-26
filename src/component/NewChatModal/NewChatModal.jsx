@@ -25,7 +25,7 @@ export default function NewChatModal({ isOpen, onClose, onSave, initialData }) {
     try {
       let response;
 
-      if (initialData?._id) {
+      if (initialData._id) {
         // edit
         response = await axios.put(`${BASE_URL}/api/chat/${initialData._id}`, {
           firstName,
@@ -45,6 +45,10 @@ export default function NewChatModal({ isOpen, onClose, onSave, initialData }) {
       onClose();
     } catch (err) {
       console.error("Failed to save chat:", err);
+      if (err.response) {
+        console.error("Error status:", err.response.status);
+        console.error("Error data:", err.response.data);
+      }
     }
   };
 
@@ -59,18 +63,20 @@ export default function NewChatModal({ isOpen, onClose, onSave, initialData }) {
       <h2>{initialData?._id ? "Edit Chat" : "Create New Chat"}</h2>
       <form onSubmit={handleSubmit} className={css.form}>
         <input
+          className={css.input}
           placeholder="First name"
           required
           value={firstName}
           onChange={(e) => setFirstName(e.target.value)}
         />
         <input
+          className={css.input}
           placeholder="Last name"
           required
           value={lastName}
           onChange={(e) => setLastName(e.target.value)}
         />
-        <button type="submit">
+        <button type="submit" className={css.addBtn}>
           {initialData?._id ? "Update Chat" : "Add new Chat"}
         </button>
         <button type="button" onClick={onClose} className={css.closeBtn}>

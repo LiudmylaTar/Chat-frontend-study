@@ -1,6 +1,6 @@
 .modal {
   position: relative;
-  background: rgb(234, 245, 242);
+  background: rgb(244, 250, 248);
   padding: 24px;
   max-width: 90vw;
   max-height: 90vh;
@@ -12,6 +12,7 @@
   display: flex;
   flex-direction: column;
   gap: 8px;
+  margin-top: 16px;
 }
 .overlay {
   position: fixed;
@@ -32,4 +33,25 @@
   border: none;
   color: #141416;
   cursor: pointer;
+}
+.addBtn {
+  cursor: pointer;
+  margin-top: 12px;
+  padding: 6px 12px;
+  margin: 0 auto;
+  border-radius: 6px;
+  border: none;
+  background-color: rgb(169, 233, 245, 0.5);
+  transition: background-color 0.25s cubic-bezier(0.39, 0.575, 0.565, 1);
+}
+.addBtn:hover,
+.addBtn:focus {
+  background-color: rgb(166, 221, 235);
+}
+.input {
+  border: 1px solid rgb(28, 113, 92);
+  border-radius: 4px;
+  padding: 4px 8px;
+  outline: none;
+  width: 100%;
 }
