@@ -4,12 +4,11 @@ import ChatPreviewList from "./component/ChatPreviewList/ChatPreviewList";
 import "./App.css";
 import Header from "./component/Header/Header";
 import ChatWindow from "./component/ChatWindow/ChatWindow";
-// import { mockChats } from "./data/mockChats";
 import NewChatModal from "./component/NewChatModal/NewChatModal";
-import axios from "axios";
 import { useDebounce } from "use-debounce";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { fetchChats, deleteChat } from "./chat-api";
 
 function App() {
   const [chats, setChats] = useState([]);
@@ -20,36 +19,22 @@ function App() {
   const isModalOpen = !!editChat;
   const selectedChatIdRef = useRef(selectedChat?._id);
 
-  const BASE_URL = import.meta.env.VITE_API_BASE_URL;
-
   useEffect(() => {
-    const fetchChats = async () => {
+    const getChats = async () => {
       try {
-        const res = await axios.get(`${BASE_URL}/api/chat`);
-        setChats(res.data);
-        setSelectedChat(res.data[0] || null); // перший чат — як активний
+        const data = await fetchChats();
+        setChats(data);
+        setSelectedChat(data[0] || null); // перший чат — як активний
       } catch (err) {
         console.error("Failed to fetch chats:", err);
       }
     };
-    fetchChats();
+    getChats();
   }, []);
 
   useEffect(() => {
     selectedChatIdRef.current = selectedChat?._id;
   }, [selectedChat]);
-
-  const handleCreateChat = async (newChatData) => {
-    try {
-      const res = await axios.post(`${BASE_URL}/api/chat`, newChatData);
-      const createdChat = res.data;
-
-      setChats((prev) => [...prev, createdChat]);
-      setEditChat(null);
-    } catch (err) {
-      console.error("Failed to create chat:", err);
-    }
-  };
 
   const searchChat = useMemo(() => {
     return chats.filter((chat) =>
@@ -61,10 +46,7 @@ function App() {
 
   const handleDelete = async (chatId) => {
     try {
-      const res = await fetch(`${BASE_URL}/api/chat/${chatId}`, {
-        method: "DELETE",
-      });
-      const data = await res.json();
+      const remove = await deleteChat(chatId);
       setChats((prevChats) => prevChats.filter((chat) => chat._id !== chatId));
 
       if (selectedChat?._id === chatId) {
@@ -76,14 +58,8 @@ function App() {
   };
 
   const addMessageToChat = (chatId, message) => {
-    console.log("DEBUG:", {
-      chatId,
-      selectedId: selectedChatIdRef.current,
-      sender: message.sender,
-    });
-
     if (chatId !== selectedChatIdRef.current && message.sender === "bot") {
-      toast.info(`New message from "${message.text}"`);
+      toast.info(`New message ${message.text}`);
     }
 
     setChats((prevChats) =>
@@ -111,7 +87,6 @@ function App() {
   };
 
   const handleChatSelect = (chat) => {
-    console.log("Selected chat changed to:", chat._id);
     setSelectedChat(chat);
   };
 

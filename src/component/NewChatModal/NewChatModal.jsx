@@ -2,7 +2,7 @@ import Modal from "react-modal";
 import css from "./NewChatModal.module.css";
 import { useState, useEffect } from "react";
 import { IoClose } from "react-icons/io5";
-import axios from "axios";
+import { updateChat, createChat } from "../../chat-api";
 
 export default function NewChatModal({ isOpen, onClose, onSave, initialData }) {
   const [firstName, setFirstName] = useState("");
@@ -23,32 +23,21 @@ export default function NewChatModal({ isOpen, onClose, onSave, initialData }) {
     if (!firstName.trim() || !lastName.trim()) return;
 
     try {
-      let response;
-
+      let chat;
       if (initialData._id) {
         // edit
-        response = await axios.put(`${BASE_URL}/api/chat/${initialData._id}`, {
-          firstName,
-          lastName,
-        });
+        chat = await updateChat(initialData._id, { firstName, lastName });
       } else {
         // created
-        response = await axios.post(`${BASE_URL}/api/chat`, {
-          firstName,
-          lastName,
-        });
+        chat = await createChat({ firstName, lastName });
       }
 
-      onSave(response.data);
+      onSave(chat);
       setFirstName("");
       setLastName("");
       onClose();
     } catch (err) {
       console.error("Failed to save chat:", err);
-      if (err.response) {
-        console.error("Error status:", err.response.status);
-        console.error("Error data:", err.response.data);
-      }
     }
   };
 
