@@ -9,6 +9,7 @@ import { useDebounce } from "use-debounce";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { fetchChats, deleteChat } from "./chat-api";
+import Loader from "./component/Loader/Loader";
 
 function App() {
   const [chats, setChats] = useState([]);
@@ -16,17 +17,23 @@ function App() {
   const [search, setSearch] = useState("");
   const [debouncedInputValue] = useDebounce(search, 500);
   const [editChat, setEditChat] = useState(null);
+  const [isLoading, setLoading] = useState(false);
+  const [isError, setIsError] = useState(false);
   const isModalOpen = !!editChat;
   const selectedChatIdRef = useRef(selectedChat?._id);
 
   useEffect(() => {
     const getChats = async () => {
       try {
+        setLoading(true);
         const data = await fetchChats();
         setChats(data);
-        setSelectedChat(data[0] || null); // перший чат — як активний
+        setSelectedChat(data[0] || null);
       } catch (err) {
         console.error("Failed to fetch chats:", err);
+        setIsError(true);
+      } finally {
+        setLoading(false);
       }
     };
     getChats();
@@ -90,6 +97,13 @@ function App() {
     setSelectedChat(chat);
   };
 
+  if (isError) {
+    return (
+      <div style={{ padding: "2rem", textAlign: "center", color: "red" }}>
+        ❌ Something went wrong, try again later.
+      </div>
+    );
+  }
   return (
     <>
       <Header />
@@ -113,6 +127,7 @@ function App() {
               }
             }}
           />
+          {isLoading && <Loader>Loading chats, please wait...</Loader>}
           <ChatPreviewList
             filterChats={searchChat}
             onChatSelect={handleChatSelect}
@@ -122,13 +137,17 @@ function App() {
             onAddClick={handleOpenModal}
           />
         </aside>
-        <main className="chat-area">
-          {selectedChat ? (
-            <ChatWindow chat={selectedChat} onAddMessage={addMessageToChat} />
-          ) : (
-            <p style={{ padding: "1rem" }}>Select or create a chat</p>
-          )}
-        </main>
+        {isLoading ? (
+          <Loader>Loading masseges, please wait...</Loader>
+        ) : (
+          <main className="chat-area">
+            {selectedChat ? (
+              <ChatWindow chat={selectedChat} onAddMessage={addMessageToChat} />
+            ) : (
+              <p style={{ padding: "1rem" }}>Select or create a chat</p>
+            )}
+          </main>
+        )}
       </div>
     </>
   );
